@@ -1,0 +1,6 @@
+nl\hva\caj\app\client\Client.class
+nl\hva\caj\app\Connection.class
+nl\hva\caj\app\server\ClientHandler.class
+nl\hva\caj\utils\Logger.class
+nl\hva\caj\app\server\Server.class
+nl\hva\caj\Main.class
