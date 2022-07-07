@@ -73,16 +73,15 @@ public class Client extends Connection {
 
     @Override
     public void cleanup() throws IOException {
-        // rem sock
-        socket.close();
-        socket = null;
-
         // rem io
         inputStream.close();
         inputStream = null;
         outputStream.close();
         outputStream = null;
 
+        // rem sock
+        socket.close();
+        socket = null;
     }
 
     private void sendText(String message) throws IOException {

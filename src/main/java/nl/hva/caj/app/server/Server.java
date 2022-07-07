@@ -84,11 +84,13 @@ public class Server extends Connection {
 
     public void broadcastText(ClientHandler clientHandler, String clientMessage) {
         clients.forEach(client -> {
-            if (client.getNickname().equals(clientHandler.getNickname())) return;
-
             try {
+                // format out
+                String out = String.format("%s: %s", clientHandler.getNickname(), clientMessage);
+                Logger.log("[BROADCAST] " + out);
+
                 // broadcast msg
-                client.getOutputStream().write(clientMessage);
+                client.getOutputStream().write(out);
                 client.getOutputStream().newLine();
                 client.getOutputStream().flush();
             } catch (IOException e) {
