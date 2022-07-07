@@ -3,6 +3,7 @@ package nl.hva.caj.app.client;
 import nl.hva.caj.app.Connection;
 import nl.hva.caj.utils.Logger;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -24,7 +25,14 @@ public class Client extends Connection {
 
     @Override
     protected void initialize() throws IOException {
-        socket = new Socket(hostAddress, port);
+        while (socket == null || !socket.isConnected()) {
+            try {
+                Logger.logf("Trying to connect to server: %s:%d", hostAddress, port);
+                socket = new Socket(hostAddress, port);
+            } catch (Exception ignored) {
+            }
+        }
+
         inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         outputStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         Logger.logf("Connected to server: %s", socket.getRemoteSocketAddress());
@@ -34,12 +42,13 @@ public class Client extends Connection {
     public void start() throws IOException {
         listen();
 
-        nickname = "BIG BOI";
+        nickname = JOptionPane.showInputDialog("Nickname: ");
+        if (nickname.equals(""))
+            nickname = String.format("USER_%.0f", (Math.random() * (Integer.MAX_VALUE >> 2)));
 
+        // TODO: set this to add other creds
         // tell the server our creds
-        outputStream.write(nickname);
-        outputStream.newLine();
-        outputStream.flush();
+        sendText(nickname);
 
         // TODO: move over to GUI
         // input
@@ -47,12 +56,8 @@ public class Client extends Connection {
         while (socket != null && socket.isConnected()) {
             System.out.print("You: ");
             String message = scanner.nextLine();
-
-            outputStream.write(message);
-            outputStream.newLine();
-            outputStream.flush();
-
             System.out.println();
+            sendText(message);
         }
     }
 
@@ -63,7 +68,7 @@ public class Client extends Connection {
             while (socket != null && socket.isConnected()) {
                 try {
                     incoming = inputStream.readLine();
-                    System.out.println("SERVER: " + incoming);
+                    Logger.log(incoming);
                 } catch (IOException e) {
                     Logger.errf("Error when reading incoming data: ", e.getMessage());
                 }
